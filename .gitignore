@@ -784,3 +784,6 @@ $RECYCLE.BIN/
 
 #???
 TemplateEngineHost/
+
+# C# Dev Kit cache files
+*.lscache
