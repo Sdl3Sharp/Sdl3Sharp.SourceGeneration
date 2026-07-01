@@ -173,7 +173,7 @@ partial class NativeImportSourceGenerator
 
 				builder.Append($$"""
 
-                        internal static global::System.IntPtr {{symbolIdentifier}};
+                        internal unsafe static readonly void* {{symbolIdentifier}};
 
                     """);
 			}
@@ -207,7 +207,7 @@ partial class NativeImportSourceGenerator
 
 					builder.Append($$"""
 
-                        internal static global::System.IntPtr {{symbolIdentifier}};
+                        internal unsafe static readonly void* {{symbolIdentifier}};
 
                     """);
 				}
@@ -215,9 +215,12 @@ partial class NativeImportSourceGenerator
 
             builder.Append($$"""
 
-                    [global::System.Runtime.CompilerServices.SkipLocalsInit]
                     [global::System.Runtime.CompilerServices.ModuleInitializer]
                     internal static void ModuleInitializer()
+                        => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::{{libraryIdentifier}}).TypeHandle);
+
+                    [global::System.Runtime.CompilerServices.SkipLocalsInit]
+                    unsafe static {{libraryIdentifier}}()
                     {       
                 """);
 
@@ -260,7 +263,7 @@ partial class NativeImportSourceGenerator
                         global::System.Runtime.InteropServices.DllImportSearchPath? searchPath;
                         global::System.IntPtr libraryHandle;
 
-                        do
+                        while (true)
                         {
                             (libraryName, searchPath) = global::{{NativeImportAttributesNamespaceName}}.{{NativeImportLibraryTypeName}}.{{NativeImportLibraryGetLibraryNameAndSearchPathMethodName}}<{{importLibraryTypeName}}>();
 
@@ -286,8 +289,7 @@ partial class NativeImportSourceGenerator
                             {
                                 return;
                             }
-                        }
-                        while (true);
+                        }                        
 
                 """);
 
@@ -300,13 +302,13 @@ partial class NativeImportSourceGenerator
 
                 builder.Append($$"""
 
-                            do
+                            while (true)
                             {                    
                                 if (!string.IsNullOrWhiteSpace("{{symbolName}}"))
                                 {
                                     try
                                     {
-                                        {{symbolIdentifier}} = global::System.Runtime.InteropServices.NativeLibrary.GetExport(libraryHandle, "{{symbolName}}");
+                                        {{symbolIdentifier}} = unchecked((void*)global::System.Runtime.InteropServices.NativeLibrary.GetExport(libraryHandle, "{{symbolName}}"));
 
                                         break;
                                     }
@@ -324,8 +326,9 @@ partial class NativeImportSourceGenerator
                                 {
                                     return;
                                 }
-                            }
-                            while (false);
+
+                                break;
+                            }                            
 
                     """);
             }
@@ -357,13 +360,13 @@ partial class NativeImportSourceGenerator
 
                     builder.Append($$"""
 
-                                    do
+                                    while (true)
                                     {                    
                                         if (!string.IsNullOrWhiteSpace("{{symbolName}}"))
                                         {
                                             try
                                             {
-                                                {{symbolIdentifier}} = global::System.Runtime.InteropServices.NativeLibrary.GetExport(libraryHandle, "{{symbolName}}");
+                                                {{symbolIdentifier}} = unchecked((void*)global::System.Runtime.InteropServices.NativeLibrary.GetExport(libraryHandle, "{{symbolName}}"));
 
                                                 break;
                                             }
@@ -381,8 +384,9 @@ partial class NativeImportSourceGenerator
                                         {
                                             return;
                                         }
+
+                                        break;
                                     }
-                                    while (false);
 
                         """);
                 }
