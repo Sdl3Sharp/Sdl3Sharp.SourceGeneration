@@ -173,7 +173,7 @@ partial class NativeImportSourceGenerator
 
 				builder.Append($$"""
 
-                        internal unsafe static readonly void* {{symbolIdentifier}};
+                        internal unsafe static void* {{symbolIdentifier}};
 
                     """);
 			}
@@ -207,7 +207,7 @@ partial class NativeImportSourceGenerator
 
 					builder.Append($$"""
 
-                        internal unsafe static readonly void* {{symbolIdentifier}};
+                        internal unsafe static void* {{symbolIdentifier}};
 
                     """);
 				}
@@ -216,11 +216,8 @@ partial class NativeImportSourceGenerator
             builder.Append($$"""
 
                     [global::System.Runtime.CompilerServices.ModuleInitializer]
-                    internal static void ModuleInitializer()
-                        => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::{{libraryIdentifier}}).TypeHandle);
-
                     [global::System.Runtime.CompilerServices.SkipLocalsInit]
-                    unsafe static {{libraryIdentifier}}()
+                    internal unsafe static void ModuleInitializer()
                     {       
                 """);
 
